@@ -1,14 +1,18 @@
 from rest_framework.generics import get_object_or_404
-from rest_framework import generics
+from rest_framework import generics, viewsets
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.http import HttpResponse
 
 from .models import Car, Order
-from .serializers import CarSerializer, OrderSerializer
+from django.contrib.auth.models import User
+from .serializers import CarSerializer, OrderSerializer, UserSerializer
+
 
 def index(request):
     return HttpResponse('Намана')
+
 
 class OrderView(APIView):
     def get(self, request):
@@ -21,6 +25,7 @@ class OrderView(APIView):
         if serializer.is_valid(raise_exception=True):
             order_save = serializer.save()
         return Response({"success": "Order '{}' create successfully".format(order_save.id)})
+
 
 class CarView(APIView):
     def get(self, request):
@@ -49,11 +54,25 @@ class CarView(APIView):
         car.delete()
         return Response({"message": "Car with id `{}` has been deleted.".format(pk)}, status=204)
 
+
 class CarList(generics.ListCreateAPIView):
+    permission_classes = [AllowAny]
     queryset = Car.objects.all()
     serializer_class = CarSerializer
 
 
 class CarDetail(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [AllowAny]
     queryset = Car.objects.all()
     serializer_class = CarSerializer
+
+
+class UserList(generics.ListCreateAPIView):
+    permission_classes = [AllowAny]
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+
+class UserDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer

@@ -1,8 +1,10 @@
 from django.urls import path
 
-from .views import index, CarView, OrderView, CarList, CarDetail
+from .views import index, CarView, OrderView, CarList, CarDetail, UserList, UserDetail
 
 urlpatterns = [
+    path('users/', UserList.as_view()),
+    path('users/<int:pk>', UserDetail.as_view()),
     path('cars/', CarList.as_view()),
     path('cars/<int:pk>', CarDetail.as_view()),
     path('orders/', OrderView.as_view()),

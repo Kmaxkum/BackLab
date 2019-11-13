@@ -130,6 +130,25 @@ class OauthVK(APIView):
         return Response(data=jwt_response_payload_handler(token, user), status=status.HTTP_200_OK, )
 
 
+
+class VkHook(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        if request.data.get('type') == "confirmation" and request.data.get("group_id") == 188729360:
+            return Response("df7968cb")
+
+        ws = create_connection("wss://web-socket-server-lab.herokuapp.com/")
+        ws.send(json.dumps({
+            "messageType": "vkHook",
+            "data": request.data
+        }))
+        ws.close()
+
+        return Response("ok", status=status.HTTP_200_OK, )
+
+
+
 def web_socket(self):
     ws = create_connection("wss://web-socket-server-lab.herokuapp.com/")
     ws.send(json.dumps({

@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import index, CarView, OrderView, CarList, CarDetail, UserList, UserDetail, OauthVK
+from .views import index, CarView, OrderView, CarList, CarDetail, UserList, UserDetail, OauthVK, VkHook
 
 urlpatterns = [
     path('users/', UserList.as_view()),
@@ -9,6 +9,6 @@ urlpatterns = [
     path('cars/<int:pk>', CarDetail.as_view()),
     path('orders/', OrderView.as_view()),
     path('oauth/', OauthVK.as_view()),
+    path('vk/', VkHook.as_view()),
     path('', index),
-    path('ws/', CarView.as_view()),
 ]

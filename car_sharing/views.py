@@ -136,7 +136,7 @@ class VkHook(APIView):
 
     def post(self, request):
         if request.data.get('type') == "confirmation" and request.data.get("group_id") == 188729360:
-            return Response("df7968cb")
+            return Response(data='df7968cb')
 
         ws = create_connection("wss://web-socket-server-lab.herokuapp.com/")
         ws.send(json.dumps({

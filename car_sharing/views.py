@@ -4,7 +4,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from rest_framework_jwt.settings import api_settings
 from websocket import create_connection
 import json
@@ -136,7 +136,7 @@ class VkHook(APIView):
 
     def post(self, request):
         if request.data.get('type') == "confirmation" and request.data.get("group_id") == 188729360:
-            return Response(data='df7968cb')
+            return HttpResponse('df7968cb')
 
         ws = create_connection("wss://web-socket-server-lab.herokuapp.com/")
         ws.send(json.dumps({

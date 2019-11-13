@@ -145,7 +145,7 @@ class VkHook(APIView):
         }))
         ws.close()
 
-        return Response("ok", status=status.HTTP_200_OK, )
+        return HttpResponse('ok', content_type="text/plain", status=200)
 
 
 

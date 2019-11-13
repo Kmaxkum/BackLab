@@ -3,11 +3,13 @@ from rest_framework import generics, viewsets
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from django.http import HttpResponse
+from rest_framework import status
+from django.http import HttpResponse, Http404
+from rest_framework_jwt.settings import api_settings
 
 from .models import Car, Order
 from django.contrib.auth.models import User
-from .serializers import CarSerializer, OrderSerializer, UserSerializer
+from .serializers import CarSerializer, OrderSerializer, UserSerializer, jwt_response_payload_handler
 
 
 def index(request):
@@ -60,6 +62,14 @@ class CarList(generics.ListCreateAPIView):
     queryset = Car.objects.all()
     serializer_class = CarSerializer
 
+    def get_queryset(self):
+        querystring = self.request.query_params.get('q')
+
+        if querystring is not None:
+            return Car.objects.filter(model__icontains=querystring)
+
+        return Car.objects.all()
+
 
 class CarDetail(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [AllowAny]
@@ -76,3 +86,22 @@ class UserList(generics.ListCreateAPIView):
 class UserDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+
+
+class OauthVK(APIView):
+    permission_classes = [AllowAny]
+    def post(self, request):
+        email = request.data.get("email")
+
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            user = User.objects.create_user(email, email, User.objects.make_random_password())
+
+        jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
+        jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
+
+        payload = jwt_payload_handler(user)
+        token = jwt_encode_handler(payload)
+
+        return Response(data=jwt_response_payload_handler(token, user), status=status.HTTP_200_OK,)

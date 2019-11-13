@@ -102,26 +102,20 @@ TEMPLATES = [
 ]
 
 AUTHENTICATION_BACKENDS = (
-    # Google OAuth2
-    'social_core.backends.google.GoogleOAuth2',
-
-    # django-rest-framework-social-oauth2
-    'rest_framework_social_oauth2.backends.DjangoOAuth2',
+    'social_core.backends.vk.VKOAuth2',
 
     # Django
     'django.contrib.auth.backends.ModelBackend',
 
 )
 
-# Google configuration
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '595843031589-l7jutln59rrki7itf49kt52ad4kf5gv8.apps.googleusercontent.com'
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'a2uDjs78Ewc8tJ5AeUZzl4JE'
+# Vk configuration
+SOCIAL_AUTH_VK_OAUTH2_KEY = '7197523'
+SOCIAL_AUTH_VK_OAUTH2_SECRET = 'kq7evpr5EagkqvtnPA3D'
 
-# Define SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE to get extra permissions from Google.
-SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
-    'https://www.googleapis.com/auth/userinfo.email',
-    'https://www.googleapis.com/auth/userinfo.profile',
-    ]
+
+SOCIAL_AUTH_VK_OAUTH2_SCOPE = ['email']
+
 
 WSGI_APPLICATION = 'backend.wsgi.application'
 

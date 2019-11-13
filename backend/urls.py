@@ -21,6 +21,6 @@ urlpatterns = [
     path('car_sharing_api/', include('car_sharing.urls')),
     path(r'api-token-auth/', obtain_jwt_token),
     path(r'api-token-refresh/', refresh_jwt_token),
-    path(r'auth/', include('rest_framework_social_oauth2.urls')),
+    path(r'social/', include('social_django.urls')),
     path('admin/', admin.site.urls),
 ]

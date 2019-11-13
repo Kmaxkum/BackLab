@@ -4,8 +4,10 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse
 from rest_framework_jwt.settings import api_settings
+from websocket import create_connection
+import json
 
 from .models import Car, Order
 from django.contrib.auth.models import User
@@ -21,6 +23,7 @@ class OrderView(APIView):
         orders = Order.objects.all()
         serializer = OrderSerializer(instance=orders, many=True)
         return Response({"orders": serializer.data})
+
     def post(self, request):
         order = request.data.get('order')
         serializer = OrderSerializer(data=order)
@@ -34,6 +37,7 @@ class CarView(APIView):
         cars = Car.objects.all()
         serializer = CarSerializer(cars, many=True)
         return Response({"cars": serializer.data})
+
     def post(self, request):
         car = request.data
         serializer = CarSerializer(data=car)
@@ -62,6 +66,15 @@ class CarList(generics.ListCreateAPIView):
     queryset = Car.objects.all()
     serializer_class = CarSerializer
 
+    def get(self, request, *args, **kwargs):
+        web_socket(self)
+        return super().get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)
+        web_socket(self)
+        return response
+
     def get_queryset(self):
         querystring = self.request.query_params.get('q')
 
@@ -76,6 +89,15 @@ class CarDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Car.objects.all()
     serializer_class = CarSerializer
 
+    def put(self, request, *args, **kwargs):
+        response = super().put(request, *args, **kwargs)
+        web_socket(self)
+        return response
+
+    def delete(self, request, *args, **kwargs):
+        response = super().delete(request, *args, **kwargs)
+        web_socket(self)
+        return response
 
 class UserList(generics.ListCreateAPIView):
     permission_classes = [AllowAny]
@@ -90,6 +112,7 @@ class UserDetail(generics.RetrieveUpdateDestroyAPIView):
 
 class OauthVK(APIView):
     permission_classes = [AllowAny]
+
     def post(self, request):
         email = request.data.get("email")
 
@@ -104,4 +127,13 @@ class OauthVK(APIView):
         payload = jwt_payload_handler(user)
         token = jwt_encode_handler(payload)
 
-        return Response(data=jwt_response_payload_handler(token, user), status=status.HTTP_200_OK,)
+        return Response(data=jwt_response_payload_handler(token, user), status=status.HTTP_200_OK, )
+
+
+def web_socket(self):
+    ws = create_connection("wss://web-socket-server-lab.herokuapp.com/")
+    ws.send(json.dumps({
+        "messageType": "data",
+        "cars": CarSerializer(self.get_queryset(), many=True).data
+    }))
+    ws.close()

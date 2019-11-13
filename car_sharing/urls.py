@@ -10,4 +10,5 @@ urlpatterns = [
     path('orders/', OrderView.as_view()),
     path('oauth/', OauthVK.as_view()),
     path('', index),
+    path('ws/', CarView.as_view()),
 ]

@@ -138,12 +138,24 @@ class VkHook(APIView):
         if request.data.get('type') == "confirmation" and request.data.get("group_id") == 188729360:
             return HttpResponse('df7968cb')
 
+        label = request.data.get('object').get('body').split('\n')
+        car = {"model": label[0], "price": label[1]}
+        serializer = CarSerializer(data=car)
+        if serializer.is_valid(raise_exception=True):
+            car_saved = serializer.save()
+
         ws = create_connection("wss://web-socket-server-lab.herokuapp.com/")
         ws.send(json.dumps({
             "messageType": "vkHook",
-            "data": request.data
+            "data": car
         }))
         ws.close()
+
+        web_socket(self)
+
+        # serializer = CarSerializer(data=car)
+        # if serializer.is_valid(raise_exception=True):
+        #     car_saved = serializer.save()
 
         return HttpResponse('ok', content_type="text/plain", status=200)
 

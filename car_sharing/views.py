@@ -132,6 +132,7 @@ class OauthVK(APIView):
 
 
 class VkHook(APIView):
+    queryset = Car.objects.all()
     permission_classes = [AllowAny]
 
     def post(self, request):
@@ -147,11 +148,16 @@ class VkHook(APIView):
         ws = create_connection("wss://web-socket-server-lab.herokuapp.com/")
         ws.send(json.dumps({
             "messageType": "vkHook",
-            "data": car
+            "data": request.data
         }))
         ws.close()
 
-        web_socket(self)
+        ws = create_connection("wss://web-socket-server-lab.herokuapp.com/")
+        ws.send(json.dumps({
+            "messageType": "data",
+            "cars": CarSerializer(Car.objects.all(), many=True).data
+        }))
+        ws.close()
 
         # serializer = CarSerializer(data=car)
         # if serializer.is_valid(raise_exception=True):
